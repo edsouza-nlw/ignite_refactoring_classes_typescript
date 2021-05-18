@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FiEdit3, FiTrash } from 'react-icons/fi';
 
 import api from '../../services/api';
-
 import { formatPrice } from '../../util/format';
 
 import { Container } from './styles';
@@ -13,7 +12,7 @@ interface FoodDish {
   image: string;
   description: string;
   price: number;
-  isAvailable: boolean;
+  available: boolean;
 }
 
 interface FoodProps {
@@ -23,19 +22,20 @@ interface FoodProps {
 }
 
 export function Food({ food, handleEditFood, handleDelete }: FoodProps) {
-  const [isAvailable, setIsAvailable] = useState(food.isAvailable);
+  const [isAvailable, setIsAvailable] = useState(food.available);
 
-  async function toggleAvailable() {
+  const toggleAvailable = useCallback(async () => {
     await api.put(`/foods/${food.id}`, {
       ...food,
       available: !isAvailable,
     });
-    setIsAvailable(!isAvailable);
-  }
 
-  function setEditingFood() {
+    setIsAvailable(!isAvailable);
+  }, [isAvailable, setIsAvailable, food]);
+
+  const setEditingFood = useCallback(() => {
     handleEditFood(food);
-  }
+  }, [food, handleEditFood]);
 
   return (
     <Container available={isAvailable}>
